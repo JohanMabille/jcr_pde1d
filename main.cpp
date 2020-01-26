@@ -69,12 +69,13 @@ int main(int argc, char* argv[])
 	//create the initiale vector T
 	std::vector<double> init_f(grille.get_init_vector());
 	
-	std::vector<std::vector<double>> res;
-	
-	//project::solver sol(grille, res);
 	// Uncomment this part to run the solver with non constant vol and non constant rate 
 	//project::solver sol_2(grille, theta_,c2.get_cond(), vol_obj_2.vector_vol(), vol_obj_r_2.vector_vol());
 	// std::vector<std::vector<double>> price2 = sol2.get_vector_price();
+	
+	// Uncomment this part to run the solver with Derichtlet conditions 
+	//project::solver sol_d(grille, theta_,c.get_cond(), vol_mat, rate_mat);
+	// std::vector<std::vector<double>> price_d = sol_d.get_vector_price();
 	
 	//solver with constant rate and constant vol
 	project::solver sol(grille, theta_,c2.get_cond(), vol_mat, rate_mat);
@@ -112,7 +113,11 @@ int main(int argc, char* argv[])
 	
 
 	//this creates the Greek object from the solver object 
-	project::Greeks g(grille, sol);
+	
+	//project::Greeks g2(grille, sol); uncomment this to have 
+	
+	std::vector<double> coef = c2.get_coef_neumann();
+	project::Greeks g(grille, sol, coef);
 	
 	std::vector<double> delta = g.get_delta();
 	std::vector<double> gamma = g.get_gamma();
@@ -124,6 +129,14 @@ int main(int argc, char* argv[])
 	project::print(gamma);
 	std::cout << "Theta " << std::endl;
 	project::print(theta);
+	
+	//Le prix converge seulement pour 258 spot et 252 steps de temps pour les paramètres actuellement retenus (vol de 20%, rate de 5% et theta 1/2)
+	//La convergence actuelle est achevée uniquement avec Neumann (différence d'environ 10 centimes avec Derichtlet)
+	//APrès avoir vérifié à nouveau les coefficients ainsi que tous les outputs intermédiaires, il semble certain que nous passons à côté de quelque chose qui nous empêche de converger
+	//Mais nous ne sommes pas certains de savoir quoi ni comment, pour débeuger nous avons printer différents outputs intermédiaires (conditions initiales, vector solution avant/après le passage dans l'inversion de matrice)
+	//Mais rien ne nous semble péché de ce côté là...
+	//L'absence de convergence totale et sans accroc en prix nous empêche aussi d'avoir des grecques corrects comme vous pourrez le constater.
+	//Nous restons à votre disposition si vous aviez le temps après correction de nous expliquer ce que nous avons rater
 	
 	delete option;
 		
