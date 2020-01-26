@@ -35,8 +35,8 @@ int main(int argc, char* argv[])
 	
 
 	//Boundaries : 
-	long s = grille.Getvector_stock().size();
-	long _t_ = grille.Getvector_time().size();
+	std::size_t s = grille.Getvector_stock().size();
+	std::size_t  _t_ = grille.Getvector_time().size();
 	std::vector<double> sigma(s,v);
 	std::vector<double> rate(s,r);
 	project::Derichtlet c(grille, rate);
@@ -90,11 +90,13 @@ int main(int argc, char* argv[])
 	} */
 	
 	//this print both the closed formula price and the FDM one 
-	for(int i=1; i<grille.Getvector_stock().size()-1;i++){
+	for(int i=1; i<grille.Getvector_stock().size()-1;i++)
+	{
 		
-		 if (grille.Getvector_stock()[i] == log(S)){
+		 if (grille.Getvector_stock()[i] == log(S))
+		{
 			 
-			 double indice = i;
+			 size_t indice = i;
 			 
 			 double p = sol.get_price(i);
 			 
@@ -104,7 +106,7 @@ int main(int argc, char* argv[])
 			 std::cout << "price BS is " << bs_ << std::endl;
 		
 		
-	};
+		};
 	
 	}
 	
@@ -128,6 +130,8 @@ int main(int argc, char* argv[])
 	project::print(gamma);
 	std::cout << "Theta " << std::endl;
 	project::print(theta);
+	
+	delete option;
 		
 /* 	std::cout<< "fonction calcul cond init:" << std::endl;
 	std::cout << grille.init_cond(S) << std::endl;
@@ -154,15 +158,14 @@ int main(int argc, char* argv[])
 	std::cout << grille.getdt() << std::endl;
 	
 	std::cout<< "vecteur dirichlet:" << std::endl;
-	project::print(c2.get_cond());
+	project::print(c.get_cond());
 	std::cout<< "Size vecteur dirichlet:" << std::endl;
-	std::cout<< c2.get_cond().size() <<std::endl;
-	
+	std::cout<< c.get_cond().size() <<std::endl;
 	
 	std::cout<< "vecteur Neumann:" << std::endl;
 	project::print(c2.get_cond()); */
 
-	delete option;
+	
 
 
 

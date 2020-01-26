@@ -51,6 +51,6 @@ class mesh
 //Method to print vector content
 void print(const std::vector<double>& v);
 //Method to transform the vector boundaries into matrix for resolution;
-std::vector<std::vector<double>> transform_matrix(const std::vector<double>& vector_init, const double& nb_rows);
+std::vector<std::vector<double>> transform_matrix(const std::vector<double>& vector_init, const size_t& nb_rows);
 }
 #endif

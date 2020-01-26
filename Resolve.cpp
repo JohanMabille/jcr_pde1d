@@ -15,8 +15,8 @@ namespace project{
 	
 	 std::vector<std::vector<double>> vol(vol_mat);
 	 std::vector<std::vector<double>> rate(rate_mat);
-	 long T = grid.Getvector_time().size(); 
-	 std::size_t m = grid.Getvector_stock().size();
+	 size_t T = grid.Getvector_time().size(); 
+	 size_t m = grid.Getvector_stock().size();
 	 std::vector<double> init_f = grid.get_init_vector(); // get the initial X_T
 	 
 	 init_f.erase(init_f.begin());
@@ -32,7 +32,6 @@ namespace project{
 	 std::vector<double> mid_B;
 	 
 	 
-	 //print(init_f);
 	  std::vector<double> solution_vector(init_f); //init of the solution vector 
 	  m_results.insert(m_results.begin(),solution_vector);
 	 
@@ -78,7 +77,7 @@ namespace project{
 	thomas_algorithm(up_A, mid_A, low_A, B, solution_vector);
 	 
 	
-	 for(int i = grid.Getvector_time().size() - 2; i != 0; --i)
+	 for(size_t i = grid.Getvector_time().size() - 2; i != 0; --i)
 	 {
 
 		
@@ -137,7 +136,7 @@ std::vector<std::vector<double>> solver::get_vector_price(){
 	return m_results;
 };
 
-const double solver::get_price(const double& n){
+const double solver::get_price(const size_t& n){
 	
 	return m_results[0][n];
 	
@@ -181,14 +180,14 @@ std::vector<double> solver::Mid_diag_coeff(const mesh& grid, const bool& A,const
 	tx.erase(tx.begin());
 	double dt = grid.getdt(); //need the time step 
 	double dx = grid.getdx(); //need the stock step 
-	double size_gamma = grid.Getvector_stock().size()-2; //no minus-1 as we are on diagonal 
+	size_t size_gamma = grid.Getvector_stock().size()-2; //no minus-1 as we are on diagonal 
 	
 	
 	
 		//create the vector that holds the diagonal 
 	std::vector<double> gamma_coefficient(size_gamma);
 	
-	for (std::size_t i = 0; i < size_gamma; ++i){
+	for (size_t i = 0; i < size_gamma; ++i){
 		
 		gamma_coefficient[i] =  std::pow(vol[i],2)/std::pow(dx,2) + tx[i];
 		
@@ -222,12 +221,12 @@ std::vector<double> solver::Upper_diag_coeff(const mesh& grid,const bool& A,cons
 	tx.erase(tx.begin());
 	double dt = grid.getdt(); //need the time step 
 	double dx = grid.getdx(); //need the stock step 
-	double size_alpha = grid.Getvector_stock().size()-3; //minus 1 because we are on the uppdiag 
+	size_t size_alpha = grid.Getvector_stock().size()-3; //minus 1 because we are on the uppdiag 
 	
 	//create the vector that holds the diagonal 
 	std::vector<double> alpha_coefficient(size_alpha);
 	
-	for (std::size_t i = 0; i < size_alpha; ++i){
+	for (size_t i = 0; i < size_alpha; ++i){
 		
 		alpha_coefficient[i] =  (-std::pow(vol[i],2))/(2*std::pow(dx,2)) + (std::pow(vol[i],2))/(4*dx) - (tx[i])/(2*dx);
 		
@@ -262,12 +261,12 @@ std::vector<double> solver::Lower_diag_coeff(const mesh& grid, const bool& A,con
 	tx.erase(tx.begin());
 	double dt = grid.getdt(); //need the time step 
 	double dx = grid.getdx(); //need the stock step 
-	double size_beta = grid.Getvector_stock().size()-3; //minus 1 because we are on the uppdiag 
+	size_t size_beta = grid.Getvector_stock().size()-3; //minus 1 because we are on the uppdiag 
 	
 	//create the vector that holds the diagonal 
 	std::vector<double> beta_coefficient(size_beta);
 	
-	for (std::size_t i = 0; i < size_beta; ++i){
+	for (size_t i = 0; i < size_beta; ++i){
 		
 		beta_coefficient[i] =  (-std::pow(vol[i],2))/(2*std::pow(dx,2)) + std::pow(vol[i],2)/(4*dx) + (tx[i])/(2*dx);
 		
@@ -299,10 +298,8 @@ void solver::thomas_algorithm(const std::vector<double>& upper_diag, const std::
   
   c.push_back(0.0);
   a.insert(a.begin(),0.0);
-  // Create the temprary vectors to store new coef                                                                                                                                                                                                                                                                                                                                                
+  // Create the temporary vectors to store new coef                                                                                                                                                                                                                                                                                                                                                
 
-//std::cout << "vecteur init" << f_n1.size() << std::endl;
-//print(f_n1);
 //Step 1  
   c[0] = c[0] / b[0];
   x[0] = x[0] / b[0];
@@ -325,6 +322,5 @@ void solver::thomas_algorithm(const std::vector<double>& upper_diag, const std::
   }
 };
 
-solver::~solver(){}; 
 
 }
