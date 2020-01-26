@@ -15,8 +15,6 @@ double dx = grid.getdx(); //get the stock step
 long T = grid.Getvector_time().size(); //get the number of time steps
 double nb_spot_values = grid.Getvector_stock().size(); //get the number of spot values
 std::vector<std::vector<double>> price_matrix = sol.get_vector_price(); //get the matrix of option prices
-//std::vector<double> Derichtlet.get_cond() //get the Dirichlet condition vector
-//std::vector<double> Neumann.get_cond() //get the Neumann condition vector
 
 //price_matrix.pop_back(); //get rid of the last row that is the price at T
  

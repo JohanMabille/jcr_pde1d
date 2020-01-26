@@ -31,22 +31,18 @@ namespace project{
 	 std::vector<double> low_B;
 	 std::vector<double> mid_B;
 	 
-	 //std::cout << "price at time T" << std::endl;
 	 
 	 //print(init_f);
 	  std::vector<double> solution_vector(init_f); //init of the solution vector 
+	  m_results.insert(m_results.begin(),solution_vector);
 	 
-	 //solver solver(grid, results);
-	 
-	 double BetaN = 1;
-	 double BetaN1 = 1;
-	 double AlphaN = 1;
-	 double AlphaN1 = 1;
-	 
-	 	 //initialisation de la matrice B à maturité 
+	 //initialisation de la matrice B à maturité 
 	 up_B = Upper_diag_coeff(grid,false,theta,vol.back(), rate.back());
 	 low_B = Lower_diag_coeff(grid,false,theta,vol.back(), rate.back());
 	 mid_B = Mid_diag_coeff(grid,false,theta,vol.back(), rate.back());
+	 
+	 vol.pop_back();
+	 rate.pop_back();
 	 
 	up_A = Upper_diag_coeff(grid,true,theta,vol.back(), rate.back());
 	low_A = Lower_diag_coeff(grid,true,theta,vol.back(), rate.back());
@@ -58,16 +54,15 @@ namespace project{
 		 
 		 if(s==0){
 			 
-			 BetaN = low_A[0];
-				
-			 BetaN1 = low_B[0];
+			 double BetaN = low_A[0];
+			 double BetaN1 = low_B[0];
 			 
 			 cond_diff[s] = BetaN1*matrix_boundaries[s].back()-BetaN*matrix_boundaries[s][T-1];
 		 }
 		 else if( s ==m-3){
 			 
-			 AlphaN = up_A.back();
-			 AlphaN1 = up_B.back();
+			 double AlphaN = up_A.back();
+			 double AlphaN1 = up_B.back();
 			 
 			 cond_diff[s] = AlphaN1*matrix_boundaries[s].back()-AlphaN*matrix_boundaries[s][T-1];
 			 
@@ -79,17 +74,26 @@ namespace project{
 	 
 	
 	std::vector<double> B = BX_vector(up_B,mid_B,low_B,cond_diff,init_f);
+	
+	thomas_algorithm(up_A, mid_A, low_A, B, solution_vector);
 	 
-	 
-	 for(int i = grid.Getvector_time().size() - 1; i != 0; --i)
+	
+	 for(int i = grid.Getvector_time().size() - 2; i != 0; --i)
 	 {
 
+		
 		m_results.insert(m_results.begin(),solution_vector);
+		
+		up_B = Upper_diag_coeff(grid, false,theta,vol.back(), rate.back());
+	    low_B = Lower_diag_coeff(grid, false,theta,vol.back(), rate.back());
+		mid_B = Mid_diag_coeff(grid, false,theta,vol.back(), rate.back());
+		
+		rate.pop_back();
+		vol.pop_back();
+		
 		up_A = Upper_diag_coeff(grid,true,theta,vol.back(), rate.back());
 		low_A = Lower_diag_coeff(grid,true,theta,vol.back(), rate.back());
 		mid_A = Mid_diag_coeff(grid,true,theta,vol.back(), rate.back());
-			
-		thomas_algorithm(up_A, mid_A, low_A, B, solution_vector);
 		
 		 //create a matrix containing all the prices computed by the solver in order to be displayed afterwards
 		
@@ -98,37 +102,31 @@ namespace project{
 		 	
 		if(s==0){
 			 
-			 BetaN = low_A[0];
+			 double BetaN = low_A[0];
 
-			 BetaN1 = low_B[0];
+			 double BetaN1 = low_B[0];
 			 
 			 cond_diff[s] = BetaN1*matrix_boundaries[s][i]-BetaN*matrix_boundaries[s][i-1];
 		 }
 		 else if( s==m-3){
-			 
-			 AlphaN = up_A.back();
-			 AlphaN1 = up_B.back();
+			
+			 double AlphaN = up_A.back();
+			 double AlphaN1 = up_B.back();
 			 
 			 cond_diff[s] = AlphaN1*matrix_boundaries[s][i]-AlphaN*matrix_boundaries[s][i-1];
 			 
 		 }
-		 else{ cond_diff[s] =0;};
+		 else{ cond_diff[s] =0.0;};
 	     }; 
-		
-		//std::cout << "price at time " << i-1 << " is " << std::endl;
+		 
+		 //print(cond_diff);
+		//std::cout << cond_diff.size() << std::endl;
 		
 		//print(solution_vector);
 		
-		up_B = Upper_diag_coeff(grid, false,theta,vol.back(), rate.back());
-	    low_B = Lower_diag_coeff(grid, false,theta,vol.back(), rate.back());
-		mid_B = Mid_diag_coeff(grid, false,theta,vol.back(), rate.back());
-	 
-		
 	    B = BX_vector(up_B,mid_B,low_B,cond_diff,solution_vector);
 		
-		rate.pop_back();
-		vol.pop_back();
-		
+		thomas_algorithm(up_A, mid_A, low_A, B, solution_vector);
 		 
 	 }; 
 
@@ -156,14 +154,17 @@ const double solver::get_price(const double& n){
 	
 	BX.push_back(mid[0]*Fn1[0] + upper[0]*Fn1[1] +bound_diff[0]);
 	
+	BX[0] = mid[0]*Fn1[0] + upper[0]*Fn1[1] +bound_diff[0];
 	
 	for(size_t i = 1; i < N-1; i++){
 
    	BX.push_back(mid[i]*Fn1[i] + upper[i]*Fn1[i+1] +low[i-1]*Fn1[i-1] + bound_diff[i]);
 	
+	
 	};
 	
-	BX.push_back(mid.back()*Fn1.back() + low.back()*Fn1[N-1] + bound_diff.back());
+	
+	BX.push_back(mid.back()*Fn1.back() + low.back()*Fn1[N-2] + bound_diff.back());
 	
 	return BX;
 };
@@ -180,9 +181,6 @@ std::vector<double> solver::Mid_diag_coeff(const mesh& grid, const bool& A,const
 	tx.erase(tx.begin());
 	double dt = grid.getdt(); //need the time step 
 	double dx = grid.getdx(); //need the stock step 
-	//std::vector<double> sigma_init = param.get_Vol(); //to get the volatility 
-	//std::vector<double> rate_init = param.get_Rate(); //the get the rate 
-	//double theta = param.get_Theta(); //to get the theta 
 	double size_gamma = grid.Getvector_stock().size()-2; //no minus-1 as we are on diagonal 
 	
 	
@@ -193,17 +191,16 @@ std::vector<double> solver::Mid_diag_coeff(const mesh& grid, const bool& A,const
 	for (std::size_t i = 0; i < size_gamma; ++i){
 		
 		gamma_coefficient[i] =  std::pow(vol[i],2)/std::pow(dx,2) + tx[i];
-		//gamma_coefficient[i] =  std::pow(vol[i],2)/dx + tx[i];
 		
 		if (A==false){
 			
-			gamma_coefficient[i] = -dt*(1-theta)*gamma_coefficient[i] + 1;
+			gamma_coefficient[i] = -dt*(1-theta)*gamma_coefficient[i] + 1.0;
 			//this condition checks if we are computing the A matrix or the B matrix as B is only the opposite of A 
 		}
 		
 		else{
 			
-			gamma_coefficient[i] = dt*theta*gamma_coefficient[i] + 1;
+			gamma_coefficient[i] = dt*theta*gamma_coefficient[i] + 1.0;
 		};
 	};
 	
@@ -225,9 +222,6 @@ std::vector<double> solver::Upper_diag_coeff(const mesh& grid,const bool& A,cons
 	tx.erase(tx.begin());
 	double dt = grid.getdt(); //need the time step 
 	double dx = grid.getdx(); //need the stock step 
-	//std::vector<double> sigma_init = param.get_Vol(); //to get the volatility 
-	//std::vector<double> rate_init = param.get_Rate(); //the get the rate 
-	//double theta = param.get_Theta(); //to get the theta 
 	double size_alpha = grid.Getvector_stock().size()-3; //minus 1 because we are on the uppdiag 
 	
 	//create the vector that holds the diagonal 
@@ -235,8 +229,7 @@ std::vector<double> solver::Upper_diag_coeff(const mesh& grid,const bool& A,cons
 	
 	for (std::size_t i = 0; i < size_alpha; ++i){
 		
-		//alpha_coefficient[i] =  (-std::pow(vol[i],2))/(2*std::pow(dx,2)) + std::pow(vol[i],2)/(4*std::pow(dx,2)) - (tx[i])/(2*dx);
-		alpha_coefficient[i] =  (-std::pow(vol[i],2))/(2*std::pow(dx,2)) + std::pow(vol[i],2)/(4*dx) - (tx[i])/(2*dx);
+		alpha_coefficient[i] =  (-std::pow(vol[i],2))/(2*std::pow(dx,2)) + (std::pow(vol[i],2))/(4*dx) - (tx[i])/(2*dx);
 		
 		 
 		if (A==false){
@@ -269,9 +262,6 @@ std::vector<double> solver::Lower_diag_coeff(const mesh& grid, const bool& A,con
 	tx.erase(tx.begin());
 	double dt = grid.getdt(); //need the time step 
 	double dx = grid.getdx(); //need the stock step 
-	//std::vector<double> sigma_init = param.get_Vol(); //to get the volatility 
-	//std::vector<double> rate_init = param.get_Rate(); //the get the rate 
-	//double theta = param.get_Theta(); //to get the theta 
 	double size_beta = grid.Getvector_stock().size()-3; //minus 1 because we are on the uppdiag 
 	
 	//create the vector that holds the diagonal 
@@ -279,7 +269,6 @@ std::vector<double> solver::Lower_diag_coeff(const mesh& grid, const bool& A,con
 	
 	for (std::size_t i = 0; i < size_beta; ++i){
 		
-		//beta_coefficient[i] =  (-std::pow(vol[i],2))/(2*std::pow(dx,2)) + std::pow(vol[i],2)/(4*std::pow(dx,2)) + (tx[i])/(2*dx);
 		beta_coefficient[i] =  (-std::pow(vol[i],2))/(2*std::pow(dx,2)) + std::pow(vol[i],2)/(4*dx) + (tx[i])/(2*dx);
 		
 		
@@ -311,7 +300,6 @@ void solver::thomas_algorithm(const std::vector<double>& upper_diag, const std::
   c.push_back(0.0);
   a.insert(a.begin(),0.0);
   // Create the temprary vectors to store new coef                                                                                                                                                                                                                                                                                                                                                
-  //std::vector<double> d_star(nb_spot, 0.0);      
 
 //std::cout << "vecteur init" << f_n1.size() << std::endl;
 //print(f_n1);

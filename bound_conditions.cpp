@@ -36,13 +36,12 @@ bound_conditions::bound_conditions(const mesh& _grid)
 		matrix_derichtlet.resize(size_vec*2); 
 		//std::vector<double> lower_conditions(size_vec);
 
-		double df = 0.;
 		
 		for(size_t i = 0; i < size_vec; ++i)
         {
-			df = exp(-rate[i]*(T-dt*i));
+			double df = exp(-rate[i]*(T-dt*i));//exp(-rate[i]*(T-dt*i));
 			matrix_derichtlet[i] = m_grid.init_cond(exp(spot_min),df); // for here
-			matrix_derichtlet[size_vec+i] = m_grid.init_cond(exp(spot_max),df);;
+			matrix_derichtlet[size_vec+i] = m_grid.init_cond(exp(spot_max),df);
         }
 	};
 	
@@ -63,7 +62,7 @@ bound_conditions::bound_conditions(const mesh& _grid)
 		double S_min = m_grid.Getvector_stock()[0]; 
 		double S_max = m_grid.Getvector_stock().back(); 
 		
-		double h =0.00001;
+		double h =0.0001;
 		double df_der = 1.0;
 		
 		double K1 = (m_grid.init_cond(exp(S_min +h),df_der) - m_grid.init_cond(exp(S_min -h),df_der))/(2*h);
@@ -74,12 +73,12 @@ bound_conditions::bound_conditions(const mesh& _grid)
 		
 		//std::cout<< K3 <<std::endl;
 		
-		double K2 = (m_grid.init_cond(K1+h,df_der) - m_grid.init_cond(K1-h,df_der))/(2*h);
+		double K2 = (m_grid.init_cond(exp(S_min+2*h),df_der) - m_grid.init_cond(exp(S_min),df_der) + m_grid.init_cond(exp(S_min-2*h),df_der))/(4*h*h);
 		
 		//std::cout<< K2 <<std::endl;
 		
 		
-		double K4 = (m_grid.init_cond(K3+h,df_der) - m_grid.init_cond(K3 -h,df_der))/(2*h);
+		double K4 = (m_grid.init_cond(exp(S_max+2*h),df_der) - m_grid.init_cond(exp(S_max),df_der) + m_grid.init_cond(exp(S_max-2*h),df_der))/(4*h*h);
 		
 		//std::cout<< K4 <<std::endl;
 		
