@@ -19,7 +19,7 @@ class bound_conditions
 	{
 		public:
 		
-			bound_conditions(mesh _grid);
+			bound_conditions(const mesh& _grid);
 			
 			//~bound_conditions();
 			

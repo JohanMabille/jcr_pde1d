@@ -1,5 +1,5 @@
 
-//#include "closed_form.hpp"
+#include "closed_form.hpp"
 #include "Resolve.hpp"
 #include "mesh_spot.hpp"
 #include "vol.hpp"
@@ -23,8 +23,9 @@ int main(int argc, char* argv[])
 	double theta_ = 0.5;
 	
 	// mesh discretisation parameters
-	long nb_step_spot =20;    // Spot goes from [0.0, 1.0]
-	long nb_step_time =10; 
+	// Spot goes from [0.0, 1.0]
+	long nb_step_spot =258;    
+	long nb_step_time =252; 
 	
 	
 	// Create the PayOff object (strike as parameter)
@@ -32,10 +33,8 @@ int main(int argc, char* argv[])
 	// Create the mesh object (parameters (S,Vol, Nb time step, nb stock step)
 	project::mesh grille(S,T,v,nb_step_time,nb_step_spot,option);
 	
-	//Create PDE object (to solve the problem, we provide to the class, the grid previoulsy defined in the class PDE) 
-	//PDE m(option,grille.getdx(),grille.getdt(),grille.Getvector_time(),grille.Getvector_stock());
-	
-	//test of the boundaries : 
+
+	//Boundaries : 
 	long s = grille.Getvector_stock().size();
 	long _t_ = grille.Getvector_time().size();
 	std::vector<double> sigma(s,v);
@@ -43,8 +42,21 @@ int main(int argc, char* argv[])
 	project::Derichtlet c(grille, rate);
 	project::Neumann c2(grille, theta_, sigma, rate);
 	
-	std::vector<std::vector<double>> test = project::transform_matrix(c.get_cond(),s);
+	double coef_spot_v = 0.1;
+	double coef_time_v = 0.01;
 	
+	//Create the non constante volatility object and rate object
+	
+	project::volatility vol_obj(v,grille);
+	
+	project::vol_surface vol_obj_2(v,grille,coef_spot_v,coef_time_v);
+	
+	project::volatility vol_obj_r(r,grille);
+	
+	project::vol_surface vol_obj_r_2(v,grille,coef_spot_v,coef_time_v);
+	
+
+	//Create the constante volatility and rate 
 	std::vector<std::vector<double>> vol_mat;
 	std::vector<std::vector<double>> rate_mat;
 	 
@@ -54,61 +66,84 @@ int main(int argc, char* argv[])
 		rate_mat.push_back(rate);
 	};
 	
+	//create the initiale vector T
 	std::vector<double> init_f(grille.get_init_vector());
 	
 	std::vector<std::vector<double>> res;
 	
 	//project::solver sol(grille, res);
-		 
-	std::vector<double> cond_test;
+	// Uncomment this part to run the solver with non constant vol and non constant rate 
+	//project::solver sol_2(grille, theta_,c2.get_cond(), vol_obj_2.vector_vol(), vol_obj_r_2.vector_vol());
+	// std::vector<std::vector<double>> price2 = sol2.get_vector_price();
 	
-	for(int i =0; i <test.size();i++){
-		
-		
-		cond_test.push_back(test[i].back());
-	}
+	//solver with constant rate and constant vol
+	project::solver sol(grille, theta_,c2.get_cond(), vol_mat, rate_mat);
 
-	project::solver sol(grille, theta_,c.get_cond(), vol_mat, rate_mat);
-	
-	//std::vector<double> ccc = c2.get_coef_neumann();
-	
-	std::vector<std::vector<double>> price = sol.get_price();
-	
+
+	std::vector<std::vector<double>> price = sol.get_vector_price();
+
+// Uncomment this to print all the vector of price through time 
 /* 	for(int i=0; i<price.size();i++){
 		
+		std::cout << "price at time " << i << std::endl;
 		project::print(price[i]);
 	} */
-
 	
+	//this print both the closed formula price and the FDM one 
+	for(int i=1; i<grille.Getvector_stock().size()-1;i++){
+		
+		 if (grille.Getvector_stock()[i] == log(S)){
+			 
+			 double indice = i;
+			 
+			 double p = sol.get_price(i);
+			 
+			 double bs_ = project::bs_price(S, K, v, T, true);
+			 
+			 std::cout << "price is " << p  << " and index in vector is "<< indice << std::endl;
+			 std::cout << "price BS is " << bs_ << std::endl;
+		
+		
+	};
+	
+	}
+	
+	//Nous avons essayé différentes choses pour débuger nos prix, corriger des erreurs de coefficients, rendre plus intelligible l'algorithme de Thomas
+	//Nous avons printer les tailles et les valeurs des différents vecteurs utilisés et aucun problème ne semble venir de ceci
+	//Nous sommes conscients que le prix devrait être bon avec 1000 steps pour le spot néanmoins nous trouvant le bon résultat à 10e-5 lorsque nous utilisons 258 points de spot 
+	//Ce résultat est valide pour r = 0.05, v= 0.2 et vol/rate constants et nous trouvons le même résultat avec Neumann et Derichtlet 
+	//Lorsque nous prenons des matrices de vol et de taux non constants (fonction du spot et du temps) nous trouvons un résultat relativement prochain avec 1000 points de spot et 252 de temps
+	//Néanmoins il semble il y avoir un problème plus important comme l'indique les valeurs assez folles prisent par les grecques.
+
+	//this creates the Greek object from the solver object 
 	project::Greeks g(grille, sol);
 	
 	std::vector<double> delta = g.get_delta();
 	std::vector<double> gamma = g.get_gamma();
 	std::vector<double> theta = g.get_theta();
 	
+	std::cout << "Delta " << std::endl;
 	project::print(delta);
+	std::cout << "Gamma " << std::endl;
 	project::print(gamma);
+	std::cout << "Theta " << std::endl;
 	project::print(theta);
-	
-	
-	
-	
 		
 /* 	std::cout<< "fonction calcul cond init:" << std::endl;
 	std::cout << grille.init_cond(S) << std::endl;
 
 	std::cout<< "Vecteur de prix (log):" << std::endl;
-	print(grille.Getvector_stock());
+	project::print(grille.Getvector_stock());
 	std::cout<< "Size vecteur stock:" << std::endl;
 	std::cout<< grille.Getvector_stock().size() <<std::endl;
 	
 	std::cout<< "Vecteur de temps:" << std::endl;
-	print(grille.Getvector_time());
+	project::print(grille.Getvector_time());
 	std::cout<< "Size vecteur temps:" << std::endl;
 	std::cout<< grille.Getvector_time().size() <<std::endl;
 	
 	std::cout<< "Vecteur cond init (not log):" << std::endl;
-	print(grille.get_init_vector());
+	project::print(grille.get_init_vector());
 	std::cout<< "Size vecteur cond ini:" << std::endl;
 	std::cout<< grille.get_init_vector().size() <<std::endl;
 	
@@ -119,13 +154,13 @@ int main(int argc, char* argv[])
 	std::cout << grille.getdt() << std::endl;
 	
 	std::cout<< "vecteur dirichlet:" << std::endl;
-	print(c2.get_cond());
+	project::print(c2.get_cond());
 	std::cout<< "Size vecteur dirichlet:" << std::endl;
 	std::cout<< c2.get_cond().size() <<std::endl;
 	
 	
 	std::cout<< "vecteur Neumann:" << std::endl;
-	print(c2.get_cond()); */
+	project::print(c2.get_cond()); */
 
 	delete option;
 

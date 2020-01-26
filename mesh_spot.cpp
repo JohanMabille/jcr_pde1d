@@ -94,7 +94,7 @@ namespace project{
         std::cout << std::endl;
     };
 
-	std::vector<std::vector<double>> transform_matrix(std::vector<double> vector_init, double nb_rows){
+	std::vector<std::vector<double>> transform_matrix(const std::vector<double>& vector_init, const double& nb_rows){
 	
 	double endv; 
 	//std::vector<double> upper_bound(vector_init);
