@@ -1,5 +1,5 @@
 //Partie hpp	
-	//Classe de base, permet aussi le cas le plus simple ou la vol est constante
+	//Classe de base, permet aussi le cas le plus simple ou la vol et rate sont constants
 	
 #ifndef VOL_HPP
 #define VOL_HPP
@@ -10,7 +10,7 @@
 #include "mesh_spot.hpp"
 
 namespace project {
-	class volatility 
+	class volatility //is used to build non_constant rates also
 	{
 	
 	public: 
@@ -20,19 +20,19 @@ namespace project {
 		//Method to compute a vol (vol const donc les deux coeffs valent zéro)
 		double compute_vol(const double& S = 0.,const double& t = 0.,const double& x = 0.,const double& y = 0.); //To compute a vol
 		//Method to compute vector or vol (for one step of time)
-		std::vector<double> vector_vol(const std::vector<double> v_spot,const double& t);
+		std::vector<std::vector<double>> vector_vol();
 		
 	private:
 	
-		std::vector<double> m_vol_const;
+		std::vector<std::vector<double>> m_vol_const;
 
 	
 	protected:
 		
-		std::vector<double> m_vector_time;
-		std::vector<double> m_vector_stock;
-		std::size_t m_nb_time;
-		std::size_t m_nb_spot;	
+		// std::vector<double> m_vector_time;
+		// std::vector<double> m_vector_stock;
+		// std::size_t m_nb_time;
+		// std::size_t m_nb_spot;	
 		double m_init_vol;
 		mesh m_grid;
 		
@@ -44,20 +44,37 @@ namespace project {
 	public:
 	
 		//Niveau paramètre, la classe prends en plus les deux coeff pour définit la fonction
-		vol_surface(const double& v, mesh grid, const double& coeff_tps, const double& coeff_spot);
+		vol_surface(const double& v,mesh grid, const double& coeff_tps, const double& coeff_spot);
 		
 		//On reprends les mêmes méthodes (du coup la les coeffs ne sont plus constant zéro comme au dessus)
 		double compute_vol(const double& S,const double& t,const double& x,const double& y); 
-		std::vector<double> vector_vol(const std::vector<double> v_spot,const double& t);
-
+		std::vector<std::vector<double>> vector_vol();
+		
 		
 	private:
 	
 		double m_coeff_time;
 		double m_coeff_spot;
-		std::vector<double> m_vol_matrix;
+		std::vector<std::vector<double>> m_vol_matrix;
 		
+	};
+	class rate_surface : public volatility
+	{
+	public:
+		//Niveau paramètre, la classe prends en plus les deux coeff pour définit la fonction
+		rate_surface(const double& r,mesh grid, const double& coeff_tps, const double& coeff_spot);
+		
+		//On reprends les mêmes méthodes (du coup la les coeffs ne sont plus constant zéro comme au dessus)
+		double compute_vol(const double& S,const double& t,const double& x,const double& y); 
+		std::vector<std::vector<double>> vector_vol();
+		
+		
+	private:
 	
+		double m_coeff_time;
+		double m_coeff_spot;
+		std::vector<std::vector<double>> m_rate_matrix;
+		
 	};
 }
 #endif
