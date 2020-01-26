@@ -9,10 +9,6 @@
 #include <limits>
 #include <iostream>
 
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
 namespace project{	
 	
 	class solver
@@ -20,8 +16,6 @@ namespace project{
 		public:
 		
 		solver(const mesh& grid, const double& theta,const std::vector<double>& boundaries, const std::vector<std::vector<double>>& vol_mat, const std::vector<std::vector<double>>& rate_mat); //constructor of the solver object
-		
-		~solver(); //destructor of the solver object 
 		
 		std::vector<double> Mid_diag_coeff(const mesh& grid,const bool& A,const double& theta,const std::vector<double>& sigma, const std::vector<double>& rate); 
 		std::vector<double> Upper_diag_coeff(const mesh& grid,const bool& A,const double& theta,const std::vector<double>& sigma, const std::vector<double>& rate);
@@ -32,7 +26,7 @@ namespace project{
 		std::vector<double>& f_sol);
 		
 		std::vector<std::vector<double>> get_vector_price();
-		const double get_price(const double& n);
+		const double get_price(const size_t& n);
 		
 		std::vector<double> BX_vector(const std::vector<double>& upper, const std::vector<double>& mid, const std::vector<double>& low, const std::vector<double>& bound_diff,const std::vector<double>& Fn1);
 		//this function will be used to compute at each time step the BX vector 
@@ -42,9 +36,7 @@ namespace project{
 		mesh m_mesh;
 		std::vector<std::vector<double>> m_results;
 		
-		//set of function to define the A matrix (3 better than just one huge matrix ?) 
-		//in each function we only need to input the grid and the parameters as we will get theta, sigma and r from parameters class 
-		// we will get dx and dt from grid class 
+
 	};
 }
 #endif
