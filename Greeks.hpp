@@ -13,7 +13,7 @@ class Greeks
     
 public:
 
-    Greeks(mesh grid, solver sol, std::vector<double> init_values ={0.0,0.0,0.0,0.0});
+    Greeks(const mesh& grid, solver sol, const std::vector<double>& init_values ={0.0,0.0,0.0,0.0});
     
     ~Greeks();
 	

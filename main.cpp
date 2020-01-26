@@ -1,5 +1,5 @@
 
-//#include "closed_form.hpp"
+#include "closed_form.hpp"
 #include "Resolve.hpp"
 #include "mesh_spot.hpp"
 #include "vol.hpp"
@@ -23,8 +23,8 @@ int main(int argc, char* argv[])
 	double theta_ = 0.5;
 	
 	// mesh discretisation parameters
-	long nb_step_spot =20;    // Spot goes from [0.0, 1.0]
-	long nb_step_time =10; 
+	long nb_step_spot =300;    // Spot goes from [0.0, 1.0]
+	long nb_step_time =200; 
 	
 	
 	// Create the PayOff object (strike as parameter)
@@ -43,16 +43,25 @@ int main(int argc, char* argv[])
 	project::Derichtlet c(grille, rate);
 	project::Neumann c2(grille, theta_, sigma, rate);
 	
+	double tm = 0.1;
+	double sco = 0.5;
+	
+	//project::vol_surface vo(v, grille, tm, sco);
+	
 	std::vector<std::vector<double>> test = project::transform_matrix(c.get_cond(),s);
 	
 	std::vector<std::vector<double>> vol_mat;
 	std::vector<std::vector<double>> rate_mat;
+	
 	 
 	for(long i=0; i<_t_;i++){
 		
 		vol_mat.push_back(sigma);
 		rate_mat.push_back(rate);
 	};
+	
+	//std::cout << vol_mat.size() << std::endl;
+	//std::cout << vol_mat[0].size() << std::endl;
 	
 	std::vector<double> init_f(grille.get_init_vector());
 	
@@ -72,12 +81,32 @@ int main(int argc, char* argv[])
 	
 	//std::vector<double> ccc = c2.get_coef_neumann();
 	
-	std::vector<std::vector<double>> price = sol.get_price();
+	std::vector<std::vector<double>> price = sol.get_vector_price();
 	
-/* 	for(int i=0; i<price.size();i++){
+/* 	for(int i=0; i<2;i++){
 		
+		std::cout << "price at time " << i << std::endl;
 		project::print(price[i]);
 	} */
+	
+	
+	for(int i=1; i<grille.Getvector_stock().size()-1;i++){
+		
+		 if (grille.Getvector_stock()[i] == log(S)){
+			 
+			 double indice = i;
+			 
+			 double p = sol.get_price(i);
+			 
+			 double bs_ = project::bs_price(S, K, v, T, true);
+			 
+			 std::cout << "price is " << p  << " and index in vector is "<< indice << std::endl;
+			 std::cout << "price BS is " << bs_ << std::endl;
+		
+		
+	};
+	
+	}
 
 	
 	project::Greeks g(grille, sol);
@@ -86,29 +115,25 @@ int main(int argc, char* argv[])
 	std::vector<double> gamma = g.get_gamma();
 	std::vector<double> theta = g.get_theta();
 	
-	project::print(delta);
+/* 	project::print(delta);
 	project::print(gamma);
 	project::print(theta);
-	
-	
-	
-	
 		
-/* 	std::cout<< "fonction calcul cond init:" << std::endl;
+	std::cout<< "fonction calcul cond init:" << std::endl;
 	std::cout << grille.init_cond(S) << std::endl;
 
 	std::cout<< "Vecteur de prix (log):" << std::endl;
-	print(grille.Getvector_stock());
+	project::print(grille.Getvector_stock());
 	std::cout<< "Size vecteur stock:" << std::endl;
 	std::cout<< grille.Getvector_stock().size() <<std::endl;
 	
 	std::cout<< "Vecteur de temps:" << std::endl;
-	print(grille.Getvector_time());
+	project::print(grille.Getvector_time());
 	std::cout<< "Size vecteur temps:" << std::endl;
 	std::cout<< grille.Getvector_time().size() <<std::endl;
 	
 	std::cout<< "Vecteur cond init (not log):" << std::endl;
-	print(grille.get_init_vector());
+	project::print(grille.get_init_vector());
 	std::cout<< "Size vecteur cond ini:" << std::endl;
 	std::cout<< grille.get_init_vector().size() <<std::endl;
 	
@@ -119,13 +144,13 @@ int main(int argc, char* argv[])
 	std::cout << grille.getdt() << std::endl;
 	
 	std::cout<< "vecteur dirichlet:" << std::endl;
-	print(c2.get_cond());
+	project::print(c2.get_cond());
 	std::cout<< "Size vecteur dirichlet:" << std::endl;
 	std::cout<< c2.get_cond().size() <<std::endl;
 	
 	
 	std::cout<< "vecteur Neumann:" << std::endl;
-	print(c2.get_cond()); */
+	project::print(c2.get_cond()); */
 
 	delete option;
 

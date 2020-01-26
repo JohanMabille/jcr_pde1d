@@ -9,7 +9,7 @@
 namespace project{
 
  
- solver::solver(mesh grid, double theta, const std::vector<double>& boundaries, std::vector<std::vector<double>> vol_mat,std::vector<std::vector<double>> rate_mat)
+ solver::solver(const mesh& grid, const double& theta, const std::vector<double>& boundaries, const std::vector<std::vector<double>>& vol_mat,const std::vector<std::vector<double>>& rate_mat)
  :m_mesh(grid)
  {
 	
@@ -134,12 +134,20 @@ namespace project{
 
  }; 
  
-std::vector<std::vector<double>> solver::get_price(){
+std::vector<std::vector<double>> solver::get_vector_price(){
 	
 	return m_results;
 };
+
+const double solver::get_price(const double& n){
+	
+	return m_results[0][n];
+	
+	//return the price of the option at time 0 and for a certain point of the mesh;
+	
+};
  
- std::vector<double> solver::BX_vector(std::vector<double> upper, std::vector<double> mid, std::vector<double> low, std::vector<double> bound_diff, std::vector<double> Fn1){
+ std::vector<double> solver::BX_vector(const std::vector<double>& upper, const std::vector<double>& mid, const std::vector<double>& low,const std::vector<double>& bound_diff,const std::vector<double>& Fn1){
 //this procedure creates the right_hand vector of the AX = D equation based on BX(n+1) + C(n+1) - C(n)
 	std::size_t N = mid.size(); // as the resolution si between f1 and fN-1
 	
@@ -161,13 +169,15 @@ std::vector<std::vector<double>> solver::get_price(){
 };
 	
 //set of function to define the A matrix (3 better than just one huge matrix ?) 
-std::vector<double> solver::Mid_diag_coeff(mesh grid, bool A,double theta, std::vector<double> sigma, std::vector<double> rate){
+std::vector<double> solver::Mid_diag_coeff(const mesh& grid, const bool& A,const double& theta, const std::vector<double>& sigma, const std::vector<double>& rate){
 	
-	sigma.pop_back();
-	sigma.erase(sigma.begin());
+	std::vector<double> vol(sigma);
+	std::vector<double> tx(rate);
+	vol.pop_back();
+	vol.erase(vol.begin());
 	
-	rate.pop_back();
-	rate.erase(rate.begin());
+	tx.pop_back();
+	tx.erase(tx.begin());
 	double dt = grid.getdt(); //need the time step 
 	double dx = grid.getdx(); //need the stock step 
 	//std::vector<double> sigma_init = param.get_Vol(); //to get the volatility 
@@ -182,7 +192,8 @@ std::vector<double> solver::Mid_diag_coeff(mesh grid, bool A,double theta, std::
 	
 	for (std::size_t i = 0; i < size_gamma; ++i){
 		
-		gamma_coefficient[i] =  std::pow(sigma[i],2)/std::pow(dx,2) + rate[i];
+		gamma_coefficient[i] =  std::pow(vol[i],2)/std::pow(dx,2) + tx[i];
+		//gamma_coefficient[i] =  std::pow(vol[i],2)/dx + tx[i];
 		
 		if (A==false){
 			
@@ -201,16 +212,17 @@ std::vector<double> solver::Mid_diag_coeff(mesh grid, bool A,double theta, std::
 }; 
 
 
-std::vector<double> solver::Upper_diag_coeff(mesh grid, bool A,double theta,std::vector<double> sigma, std::vector<double> rate){
+std::vector<double> solver::Upper_diag_coeff(const mesh& grid,const bool& A,const double& theta,const std::vector<double>& sigma, const std::vector<double>& rate){
 	
+	std::vector<double> vol(sigma);
+	std::vector<double> tx(rate);
+	vol.pop_back();
+	vol.pop_back();
+	vol.erase(vol.begin());
 	
-	sigma.pop_back();
-	sigma.pop_back();
-	sigma.erase(sigma.begin());
-	
-	rate.pop_back();
-	rate.pop_back();
-	rate.erase(rate.begin());
+	tx.pop_back();
+	tx.pop_back();
+	tx.erase(tx.begin());
 	double dt = grid.getdt(); //need the time step 
 	double dx = grid.getdx(); //need the stock step 
 	//std::vector<double> sigma_init = param.get_Vol(); //to get the volatility 
@@ -223,7 +235,8 @@ std::vector<double> solver::Upper_diag_coeff(mesh grid, bool A,double theta,std:
 	
 	for (std::size_t i = 0; i < size_alpha; ++i){
 		
-		alpha_coefficient[i] =  (-std::pow(sigma[i],2))/(2*std::pow(dx,2)) + std::pow(sigma[i],2)/(4*std::pow(dx,2)) - (rate[i])/(2*dx);
+		//alpha_coefficient[i] =  (-std::pow(vol[i],2))/(2*std::pow(dx,2)) + std::pow(vol[i],2)/(4*std::pow(dx,2)) - (tx[i])/(2*dx);
+		alpha_coefficient[i] =  (-std::pow(vol[i],2))/(2*std::pow(dx,2)) + std::pow(vol[i],2)/(4*dx) - (tx[i])/(2*dx);
 		
 		 
 		if (A==false){
@@ -243,16 +256,17 @@ std::vector<double> solver::Upper_diag_coeff(mesh grid, bool A,double theta,std:
 };
 
 
-std::vector<double> solver::Lower_diag_coeff(mesh grid, bool A,double theta,std::vector<double> sigma, std::vector<double> rate){
+std::vector<double> solver::Lower_diag_coeff(const mesh& grid, const bool& A,const double& theta, const std::vector<double>& sigma, const std::vector<double>& rate){
 	
+	std::vector<double> vol(sigma);
+	std::vector<double> tx(rate);
+	vol.pop_back();
+	vol.erase(vol.begin());
+	vol.erase(vol.begin());
 	
-	sigma.pop_back();
-	sigma.erase(sigma.begin());
-	sigma.erase(sigma.begin());
-	
-	rate.pop_back();
-	rate.erase(rate.begin());
-	rate.erase(rate.begin());
+	tx.pop_back();
+	tx.erase(tx.begin());
+	tx.erase(tx.begin());
 	double dt = grid.getdt(); //need the time step 
 	double dx = grid.getdx(); //need the stock step 
 	//std::vector<double> sigma_init = param.get_Vol(); //to get the volatility 
@@ -265,7 +279,8 @@ std::vector<double> solver::Lower_diag_coeff(mesh grid, bool A,double theta,std:
 	
 	for (std::size_t i = 0; i < size_beta; ++i){
 		
-		beta_coefficient[i] =  (-std::pow(sigma[i],2))/(2*std::pow(dx,2)) + std::pow(sigma[i],2)/(4*std::pow(dx,2)) + (rate[i])/(2*dx);
+		//beta_coefficient[i] =  (-std::pow(vol[i],2))/(2*std::pow(dx,2)) + std::pow(vol[i],2)/(4*std::pow(dx,2)) + (tx[i])/(2*dx);
+		beta_coefficient[i] =  (-std::pow(vol[i],2))/(2*std::pow(dx,2)) + std::pow(vol[i],2)/(4*dx) + (tx[i])/(2*dx);
 		
 		
 		if (A==false){
@@ -285,35 +300,42 @@ std::vector<double> solver::Lower_diag_coeff(mesh grid, bool A,double theta,std:
 };
 
 //this is the thomas algo for inverting the matrix  
-
-void solver::thomas_algorithm(const std::vector<double>& upper_diag, const std::vector<double>& mid_diag, const std::vector<double>& lower_diag, const std::vector<double>& f_n1, std::vector<double>& f_sol) {
+void solver::thomas_algorithm(const std::vector<double>& upper_diag, const std::vector<double>& mid_diag, const std::vector<double>& lower_diag, const std::vector<double>& f_n1, std::vector<double>& x) {
   size_t nb_spot = f_n1.size();
   
-  std::vector<double>  lower_diag2(lower_diag);
-  std::vector<double>  upper_diag2(upper_diag);
+  std::vector<double>  a(lower_diag);
+  std::vector<double>  c(upper_diag);
+  std::vector<double>  b(mid_diag);
+  x = f_n1;
   
-  upper_diag2.push_back(0.0);
-  lower_diag2.insert(lower_diag2.begin(),0.0);
-                                                                                                                                                                                                                                                                                                                                                 
-  std::vector<double> c_star(nb_spot, 0.0);
-  std::vector<double> d_star(nb_spot, 0.0);                                                                                                                                                    
-  c_star[0] = upper_diag2[0] / mid_diag[0];
-  d_star[0] = f_n1[0] / mid_diag[0];
+  c.push_back(0.0);
+  a.insert(a.begin(),0.0);
+  // Create the temprary vectors to store new coef                                                                                                                                                                                                                                                                                                                                                
+  //std::vector<double> d_star(nb_spot, 0.0);      
 
+//std::cout << "vecteur init" << f_n1.size() << std::endl;
+//print(f_n1);
+//Step 1  
+  c[0] = c[0] / b[0];
+  x[0] = x[0] / b[0];
+
+//Steps 2
   //forward sweep                                                                                                                                                  
-  for (int i=1; i<nb_spot; i++) {
-    double m = 1.0 / (mid_diag[i] - lower_diag2[i] * c_star[i-1]);
-    c_star[i] = upper_diag2[i] * m;
-    d_star[i] = (f_n1[i] - lower_diag2[i] * d_star[i-1]) * m;
+  for (std::size_t i=1; i<nb_spot; i++) 
+  {
+    const double m = 1.0 / (b[i] - a[i] * c[i-1]);
+    c[i] = c[i] * m;
+    x[i] = (x[i] - a[i] * x[i-1]) * m;
   }
   
-  f_sol.back() = (f_n1.back() - lower_diag2.back()*d_star[nb_spot-2]) / (mid_diag.back() - lower_diag2.back()*c_star[nb_spot-2]);
+ //Step 3
 
   //reverse sweep, used to update the solution vector f                                                                                                                                                 
-  for (int i=nb_spot-1; i-- > 0; ) {
-    f_sol[i] = d_star[i] - c_star[i] * f_n1[i+1];
+  for (std::size_t i=nb_spot-1; i-- > 0; ) 
+  {
+    x[i] -= c[i] * x[i+1];
   }
-}; 
+};
 
 solver::~solver(){}; 
 

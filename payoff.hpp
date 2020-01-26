@@ -31,7 +31,7 @@ class PayOff
 			virtual ~PayOffCall() {};
 
 			// Virtual function is now over-ridden (not pure-virtual anymore)
-			virtual double operator() (const double& S,const double& df = 0) const;
+			virtual double operator() (const double& S,const double& df = 1) const;
 			//virtual double init_cond(const double& S)) const;
 		  
 		 private:

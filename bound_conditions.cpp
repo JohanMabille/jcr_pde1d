@@ -8,7 +8,7 @@
 
 
 namespace project{
-bound_conditions::bound_conditions(mesh _grid)
+bound_conditions::bound_conditions(const mesh& _grid)
 	:m_grille(_grid){};
 	 
 	 //bound_conditions::~bound_conditions(){};
