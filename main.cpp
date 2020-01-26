@@ -110,12 +110,6 @@ int main(int argc, char* argv[])
 	
 	}
 	
-	//Nous avons essayé différentes choses pour débuger nos prix, corriger des erreurs de coefficients, rendre plus intelligible l'algorithme de Thomas
-	//Nous avons printer les tailles et les valeurs des différents vecteurs utilisés et aucun problème ne semble venir de ceci
-	//Nous sommes conscients que le prix devrait être bon avec 1000 steps pour le spot néanmoins nous trouvant le bon résultat à 10e-5 lorsque nous utilisons 258 points de spot 
-	//Ce résultat est valide pour r = 0.05, v= 0.2 et vol/rate constants et nous trouvons le même résultat avec Neumann et Derichtlet 
-	//Lorsque nous prenons des matrices de vol et de taux non constants (fonction du spot et du temps) nous trouvons un résultat relativement prochain avec 1000 points de spot et 252 de temps
-	//Néanmoins il semble il y avoir un problème plus important comme l'indique les valeurs assez folles prisent par les grecques.
 
 	//this creates the Greek object from the solver object 
 	project::Greeks g(grille, sol);

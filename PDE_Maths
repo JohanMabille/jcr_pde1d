@@ -4,8 +4,8 @@
 \usepackage{amsmath}
 \usepackage{float}
 \title{Projet Cpp Maths}
-\author{julien.g.baudin@gmail.com }
-\date{November 2019}
+\author{Julien Baudin, Corentin Leblond, Ruben Cohen }
+\date{December 2019}
 
 \begin{document}
 
@@ -80,8 +80,8 @@
     
     \begin{equation}
         \begin{split}
-            A_i^n & = f_{i+1}^{n}(dt\theta(\frac{-\sigma^2}{2{dx}^2}+\frac{\sigma^2}{4{dx}^2} - \frac{r}{2{dx}}) \\
-            & + f_{i-1}^{n}(dt\theta(\frac{-\sigma^2}{2{dx}^2}+\frac{\sigma^2}{4{dx}^2} + \frac{r}{2{dx}}) \\
+            A_i^n & = f_{i+1}^{n}(dt\theta(\frac{-\sigma^2}{2{dx}^2}+\frac{\sigma^2}{4dx} - \frac{r}{2{dx}}) \\
+            & + f_{i-1}^{n}(dt\theta(\frac{-\sigma^2}{2{dx}^2}+\frac{\sigma^2}{4dx} + \frac{r}{2{dx}}) \\
             & + f_{i}^{n}(dt\theta(\frac{\sigma^2}{{dx}^2}+ r))
         \label{CN_eq_3}
         \end{split}
@@ -89,8 +89,8 @@
     
     \begin{equation}
         \begin{split}
-            A_i^{n+1} & = f_{i+1}^{n}(dt(1-\theta)(\frac{-\sigma^2}{2{dx}^2}+\frac{\sigma^2}{4{dx}^2} - \frac{r}{2{dx}})) \\
-            & + f_{i-1}^{n}(dt(1-\theta)(\frac{-\sigma^2}{2{dx}^2}+\frac{\sigma^2}{4{dx}^2} + \frac{r}{2{dx}})) \\
+            A_i^{n+1} & = f_{i+1}^{n}(dt(1-\theta)(\frac{-\sigma^2}{2{dx}^2}+\frac{\sigma^2}{4dx} - \frac{r}{2{dx}})) \\
+            & + f_{i-1}^{n}(dt(1-\theta)(\frac{-\sigma^2}{2{dx}^2}+\frac{\sigma^2}{4dx} + \frac{r}{2{dx}})) \\
             & + f_{i}^{n}(dt(1-\theta)(\frac{\sigma^2}{{dx}^2}+ r))
         \label{CN_eq_4}
         \end{split}
@@ -99,14 +99,14 @@
     \noindent Let us denote:
     
     \begin{align*} 
-        \alpha^n &=  dt\theta(\frac{-\sigma^2}{2{dx}^2}+\frac{\sigma^2}{4{dx}^2} - \frac{r}{2{dx}}) \\ 
-        \beta^n &= dt\theta(\frac{-\sigma^2}{2{dx}^2}+\frac{\sigma^2}{4{dx}^2} + \frac{r}{2{dx}}) \\
+        \alpha^n &=  dt\theta(\frac{-\sigma^2}{2{dx}^2}+\frac{\sigma^2}{4dx} - \frac{r}{2{dx}}) \\ 
+        \beta^n &= dt\theta(\frac{-\sigma^2}{2{dx}^2}+\frac{\sigma^2}{4dx} + \frac{r}{2{dx}}) \\
         \gamma^n &= dt\theta(\frac{\sigma^2}{{dx}^2}+ r)
     \end{align*}
     
     \begin{align*} 
-        \alpha^{n+1} &=  dt(1-\theta)(\frac{-\sigma^2}{2{dx}^2}+\frac{\sigma^2}{4{dx}^2} - \frac{r}{2{dx}}) \\ 
-        \beta^{n+1} &= dt(1-\theta)(\frac{-\sigma^2}{2{dx}^2}+\frac{\sigma^2}{4{dx}^2} + \frac{r}{2{dx}}) \\
+        \alpha^{n+1} &=  dt(1-\theta)(\frac{-\sigma^2}{2{dx}^2}+\frac{\sigma^2}{4dx} - \frac{r}{2{dx}}) \\ 
+        \beta^{n+1} &= dt(1-\theta)(\frac{-\sigma^2}{2{dx}^2}+\frac{\sigma^2}{4dx} + \frac{r}{2{dx}}) \\
         \gamma^{n+1} &= dt(1-\theta)(\frac{\sigma^2}{{dx}^2}+ r)
     \end{align*}
     
