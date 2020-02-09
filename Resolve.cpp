@@ -9,7 +9,11 @@
 namespace project{
 
  
- solver::solver(const mesh& grid, const double& theta, const std::vector<double>& boundaries, const std::vector<std::vector<double>>& vol_mat,const std::vector<std::vector<double>>& rate_mat)
+ solver::solver(const mesh& grid, 
+                const double& theta,
+                const std::vector<double>& boundaries,
+                const std::vector<std::vector<double>>& vol_mat,
+                const std::vector<std::vector<double>>& rate_mat)
  :m_mesh(grid)
  {
 	
@@ -144,7 +148,12 @@ const double solver::get_price(const size_t& n){
 	
 };
  
- std::vector<double> solver::BX_vector(const std::vector<double>& upper, const std::vector<double>& mid, const std::vector<double>& low,const std::vector<double>& bound_diff,const std::vector<double>& Fn1){
+std::vector<double> solver::BX_vector(const std::vector<double>& upper,
+                                      const std::vector<double>& mid,
+                                      const std::vector<double>& low,
+                                      const std::vector<double>& bound_diff,
+                                      const std::vector<double>& Fn1)
+{
 //this procedure creates the right_hand vector of the AX = D equation based on BX(n+1) + C(n+1) - C(n)
 	std::size_t N = mid.size(); // as the resolution si between f1 and fN-1
 	
@@ -169,7 +178,12 @@ const double solver::get_price(const size_t& n){
 };
 	
 //set of function to define the A matrix (3 better than just one huge matrix ?) 
-std::vector<double> solver::Mid_diag_coeff(const mesh& grid, const bool& A,const double& theta, const std::vector<double>& sigma, const std::vector<double>& rate){
+std::vector<double> solver::Mid_diag_coeff(const mesh& grid,
+                                           const bool& A,
+                                           const double& theta,
+                                           const std::vector<double>& sigma,
+                                           const std::vector<double>& rate)
+{
 	
 	std::vector<double> vol(sigma);
 	std::vector<double> tx(rate);
@@ -208,7 +222,12 @@ std::vector<double> solver::Mid_diag_coeff(const mesh& grid, const bool& A,const
 }; 
 
 
-std::vector<double> solver::Upper_diag_coeff(const mesh& grid,const bool& A,const double& theta,const std::vector<double>& sigma, const std::vector<double>& rate){
+std::vector<double> solver::Upper_diag_coeff(const mesh& grid,
+                                             const bool& A,
+                                             const double& theta,
+                                             const std::vector<double>& sigma,
+                                             const std::vector<double>& rate)
+{
 	
 	std::vector<double> vol(sigma);
 	std::vector<double> tx(rate);
@@ -248,7 +267,11 @@ std::vector<double> solver::Upper_diag_coeff(const mesh& grid,const bool& A,cons
 };
 
 
-std::vector<double> solver::Lower_diag_coeff(const mesh& grid, const bool& A,const double& theta, const std::vector<double>& sigma, const std::vector<double>& rate){
+std::vector<double> solver::Lower_diag_coeff(const mesh& grid,
+                                             const bool& A,
+                                             const double& theta,
+                                             const std::vector<double>& sigma,
+                                             const std::vector<double>& rate){
 	
 	std::vector<double> vol(sigma);
 	std::vector<double> tx(rate);
@@ -288,7 +311,11 @@ std::vector<double> solver::Lower_diag_coeff(const mesh& grid, const bool& A,con
 };
 
 //this is the thomas algo for inverting the matrix  
-void solver::thomas_algorithm(const std::vector<double>& upper_diag, const std::vector<double>& mid_diag, const std::vector<double>& lower_diag, const std::vector<double>& f_n1, std::vector<double>& x) {
+void solver::thomas_algorithm(const std::vector<double>& upper_diag,
+                              const std::vector<double>& mid_diag,
+                              const std::vector<double>& lower_diag,
+                              const std::vector<double>& f_n1, std::vector<double>& x)
+{
   size_t nb_spot = f_n1.size();
   
   std::vector<double>  a(lower_diag);
