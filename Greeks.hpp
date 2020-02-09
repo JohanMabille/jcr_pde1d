@@ -17,9 +17,9 @@ public:
     
     ~Greeks();
 	
-	std::vector<double> Greeks::get_delta();
-	std::vector<double> Greeks::get_gamma();
-	std::vector<double> Greeks::get_theta();
+	std::vector<double> get_delta();
+	std::vector<double> get_gamma();
+	std::vector<double> get_theta();
 	
 	private:
 	
