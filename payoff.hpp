@@ -17,6 +17,9 @@ class PayOff
 			// We turn the payoff into a functor, goal is to compute initial condition
 			virtual double operator() (const double& S,const double& df = 1) const = 0;
 			//virtual double init_cond(const double& S)) const;
+                        
+                        // Design: consider deleting the copy and move constructors and assignment
+                        // operators (entity semantic)
 	};
 	
 	

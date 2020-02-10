@@ -26,12 +26,17 @@ class mesh
 		~mesh();
 		PayOff* option;
 		
+                // Implementation: consider returning const ref
 		std::vector<double> Getvector_time() const;
 		std::vector<double> Getvector_stock() const;
 		double getdx() const;
 		double getdt() const;
 		double get_Spot() const;
-		double init_cond(const double& x,const double& df = 0) const;
+                // Implementation: df should be 1 by default
+		double init_cond(const double& x,const double& df = 1) const;
+                // Implementation: consider returning const ref
+                // Design: Why storing the payoff here? This should
+                // not be responsibility of the mesh
 		std::vector<double> get_init_vector() const;
 	
 	

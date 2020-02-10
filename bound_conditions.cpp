@@ -29,12 +29,13 @@ bound_conditions::bound_conditions(const mesh& _grid)
 		
 		matrix_derichtlet.resize(size_vec*2); 
 
+                // Implementation: no need to precompute the values of boundary conditions
 		for(size_t i = 0; i < size_vec; ++i)
-        {
+                {
 			double df = exp(-rate[i]*(T-dt*i));
 			matrix_derichtlet[i] = m_grid.init_cond(exp(spot_min),df);
 			matrix_derichtlet[size_vec+i] = m_grid.init_cond(exp(spot_max),df);
-        }
+                }
 	};
 	
 	std::vector<double> Derichtlet::get_cond() const
@@ -45,6 +46,8 @@ bound_conditions::bound_conditions(const mesh& _grid)
 	Neumann::Neumann(const mesh& m_grid, const double& theta, const std::vector<double>& sigma, const std::vector<double>& rate)
 	:bound_conditions(m_grid)
 	{
+
+                // Implementation: no need to precompute the values of boundary conditions
 		//From mesh object
 		double dt = m_grid.getdt();
 		double dx = m_grid.getdx(); //need the stock step 

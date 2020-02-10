@@ -15,6 +15,7 @@ namespace project{
 	{
 	public:
 		
+            // Implementation: consder passing scalar types (bool, double, etc) by value
 		solver(const mesh& grid,
                        const double& theta,
                        const std::vector<double>& boundaries,

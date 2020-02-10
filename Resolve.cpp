@@ -23,6 +23,7 @@ namespace project{
 	 size_t m = grid.Getvector_stock().size();
 	 std::vector<double> init_f = grid.get_init_vector(); // get the initial X_T
 	 
+         // Implementation: why not solving from 0 to N? This would be much simpler
 	 init_f.erase(init_f.begin());
 	 init_f.pop_back();
 	 
@@ -54,7 +55,7 @@ namespace project{
 	 
 	 for(size_t s = 0; s<m-2; ++s)
 	 {
-		 
+		 // Implementation: you don't need such complexity
 		 if(s==0){
 			 
 			 double BetaN = low_A[0];
@@ -80,10 +81,17 @@ namespace project{
 	
 	thomas_algorithm(up_A, mid_A, low_A, B, solution_vector);
 	 
-	
+        // Implementation: why duplicating the code instead of having everything in a single loop?	
 	 for(size_t i = grid.Getvector_time().size() - 2; i != 0; --i)
 	 {
 
+             // Implementation: to keep things simple, build the system
+             // from 1 to N - 1
+             // THen fill line 0 and N of you matrix M, and elements 0 and N of you vector (BX)
+             // thanks to the boundary conditions.
+             // For instance, with Dirichlet:
+             // M(0, 0) = 1, M(O, 1) = 0, BX(0) = previous_sol(0)
+             // M(N, N - 1) = 0, M(N, N) = 1, BX(N) = previous_sol(N)
 		
 		m_results.insert(m_results.begin(),solution_vector);
 		
@@ -290,8 +298,9 @@ std::vector<double> solver::Lower_diag_coeff(const mesh& grid,
 	std::vector<double> beta_coefficient(size_beta);
 	
 	for (size_t i = 0; i < size_beta; ++i){
-		
-		beta_coefficient[i] =  (-std::pow(vol[i],2))/(2*std::pow(dx,2)) + std::pow(vol[i],2)/(4*dx) + (tx[i])/(2*dx);
+	
+                // Implementation: sign of second term is -
+		beta_coefficient[i] =  (-std::pow(vol[i],2))/(2*std::pow(dx,2)) - std::pow(vol[i],2)/(4*dx) + (tx[i])/(2*dx);
 		
 		
 		if (A==false){

@@ -13,10 +13,13 @@ class Greeks
     
 public:
 
+    // Implementation: consider passing sol by const ref to avoid many copies
     Greeks(const mesh& grid, solver sol, const std::vector<double>& init_values ={0.0,0.0,0.0,0.0});
     
     ~Greeks();
 	
+    // Implementation: returns by const reference
+    // Implementation: these methods should be const
 	std::vector<double> get_delta();
 	std::vector<double> get_gamma();
 	std::vector<double> get_theta();

@@ -17,15 +17,15 @@ int main(int argc, char* argv[])
 	// Create the option parameters
 	double S = 100;
 	double K = 100;  // Strike price
-	double r = 0.05;   // Risk-fr ee rate (5%)
+	double r = 0.0;   // Risk-fr ee rate (5%)
 	double v = 0.2;    // Volatility of the underlying (20%)
-	double T = 1.00;    // One year until expiry
+	double T = 1.0/365.;    // One year until expiry
 	double theta_ = 0.5;
 	
 	// mesh discretisation parameters
 	// Spot goes from [0.0, 1.0]
-	long nb_step_spot =258;    
-	long nb_step_time =252; 
+	long nb_step_spot =500;    
+	long nb_step_time =1; 
 	
 	
 	// Create the PayOff object (strike as parameter)
@@ -78,7 +78,8 @@ int main(int argc, char* argv[])
 	// std::vector<std::vector<double>> price_d = sol_d.get_vector_price();
 	
 	//solver with constant rate and constant vol
-	project::solver sol(grille, theta_,c2.get_cond(), vol_mat, rate_mat);
+	//project::solver sol(grille, theta_,c2.get_cond(), vol_mat, rate_mat);
+	project::solver sol(grille, theta_,c.get_cond(), vol_mat, rate_mat);
 
 
 	std::vector<std::vector<double>> price = sol.get_vector_price();
@@ -91,8 +92,28 @@ int main(int argc, char* argv[])
 	} */
 	
 	//this print both the closed formula price and the FDM one 
-	for(int i=1; i<grille.Getvector_stock().size()-1;i++)
+        std::vector<double> spots = grille.Getvector_stock();
+        for(size_t i = 1; i < spots.size() - 1; ++i)
+        {
+            double s = std::exp(spots[i]);
+            double df = std::exp(-r * T);
+            
+            // As stated on the gitter channel, the name is misleading. This
+            // is actually the Black formula (on forward), not the BS formula
+            // (on spot)
+            //double bs = project::bs_price(s, K, v, T, true);
+            double bs = project::bs_price(s / df, K, v, T, true) * df;
+
+            std::cout << "i = " << i
+                      << ", S = " << s
+                      << ", BS = " << bs
+                      << ", price = " << sol.get_price(i)
+                      << ", diff = " << sol.get_price(i) - bs
+                      << std::endl;
+        }
+        /*for(int i=1; i<grille.Getvector_stock().size()-1;i++)
 	{
+
 		
 		 if (grille.Getvector_stock()[i] == log(S))
 		{
@@ -109,14 +130,13 @@ int main(int argc, char* argv[])
 		
 		};
 	
-	}
+	}*/
 	
-
 	//this creates the Greek object from the solver object 
 	
 	//project::Greeks g2(grille, sol); uncomment this to have 
 	
-	std::vector<double> coef = c2.get_coef_neumann();
+	/*std::vector<double> coef = c2.get_coef_neumann();
 	project::Greeks g(grille, sol, coef);
 	
 	std::vector<double> delta = g.get_delta();
@@ -128,7 +148,7 @@ int main(int argc, char* argv[])
 	std::cout << "Gamma " << std::endl;
 	project::print(gamma);
 	std::cout << "Theta " << std::endl;
-	project::print(theta);
+	project::print(theta);*/
 	
 	//Le prix converge seulement pour 258 spot et 252 steps de temps pour les paramètres actuellement retenus (vol de 20%, rate de 5% et theta 1/2)
 	//La convergence actuelle est achevée uniquement avec Neumann (différence d'environ 10 centimes avec Derichtlet)

@@ -10,6 +10,9 @@
 #include "mesh_spot.hpp"
 
 namespace project {
+
+        // Design: no virtual method, so you won't be able to replace volatility with an object from an inheriting
+        // class in the client code.
 	class volatility //is used to build non_constant rates also
 	{
 	
@@ -20,6 +23,7 @@ namespace project {
 		//Method to compute a vol (vol const donc les deux coeffs valent zéro)
 		double compute_vol(const double& S = 0.,const double& t = 0.,const double& x = 0.,const double& y = 0.); //To compute a vol
 		//Method to compute vector or vol (for one step of time)
+                // Implementation: consider returning by constant reference
 		std::vector<std::vector<double>> vector_vol();
 		
 	private:
@@ -39,6 +43,7 @@ namespace project {
 	};
 	 //Classe ou on va dire que la volatility est fonction du temps et du spot
 	//On pourra créer ainsi d'autres classes avec différents comportement pour la vol (e.g. seulement une fonction du temps)
+        // Design: entity semantic + virtual method
 	class vol_surface : public volatility
 	{
 	public:
@@ -58,6 +63,7 @@ namespace project {
 		std::vector<std::vector<double>> m_vol_matrix;
 		
 	};
+        // Design: having a compute_vol method in a class name rate_surface should ring a bell
 	class rate_surface : public volatility
 	{
 	public:
