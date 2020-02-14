@@ -21,11 +21,14 @@ class bound_conditions
 			
 		protected:
 		
+                        // Design: why storing the grid here?
 			mesh m_grille;
 	
 	};
 	
 	
+        // Design: what the point of inheriting here since you don't define
+        // any API in the base class?
 	class Neumann: public bound_conditions 
 	{
 		
@@ -33,13 +36,17 @@ class bound_conditions
 		
 			Neumann(const mesh& m_grid, const double& theta, const std::vector<double>& sigma, const std::vector<double>& rate);
 			
+                        // Implementaiton: consider return const ref
 			std::vector<double> get_cond() const;
 			std::vector<double> get_coef_neumann() const;
+                        // Design: these should be private members
 			std::vector<double> matrix_neumann;
 			std::vector<double> coef_neumann;
 		
 	};
 
+        // Design: what the point of inheriting here since you don't define
+        // any API in the base class?
 	class Derichtlet: public bound_conditions 
 	{
 		
@@ -47,7 +54,9 @@ class bound_conditions
 		
 			Derichtlet(const mesh& m_grid, const std::vector<double>& rate);
 
+                        // Implementaiton: consider return const ref
 			std::vector<double> get_cond() const;
+                        // Design: these should be private members
 			std::vector<double> matrix_derichtlet;
 			
 		

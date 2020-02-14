@@ -22,6 +22,8 @@ namespace project{
 		//dS
 		m_dx = (high_bound - low_bound)/steps;
 		
+                // Implementation: for performance consideration, prefer
+                // resize and asisgnment to push_back
 		//Axe of spot price
 		for (long i = 0; i < m_steps+1 ; ++i)
 		{
